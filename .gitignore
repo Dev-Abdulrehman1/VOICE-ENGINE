@@ -1,0 +1,14 @@
+# secrets
+.env
+
+# generated data (sqlite db + audio files)
+data/
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# macOS
+.DS_Store

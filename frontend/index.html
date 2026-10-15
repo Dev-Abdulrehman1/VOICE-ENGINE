@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Voice Engine</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="nav">
+      <div class="brand">
+        <span class="brand-dot"></span>
+        <span>Voice Engine</span>
+      </div>
+      <nav class="nav-tabs">
+        <button type="button" class="nav-btn is-active" id="navGenerate">Generate</button>
+        <button type="button" class="nav-btn" id="navHistory">History</button>
+      </nav>
+    </header>
+
+    <main class="main">
+      <section class="view" id="viewGenerate">
+        <div class="panel">
+          <label class="field-label" for="script">Script</label>
+          <textarea id="script" class="script" spellcheck="false"
+            placeholder="Type or paste the script you want voiced…"></textarea>
+          <div class="row">
+            <span class="counter" id="counter">0 / 4000</span>
+            <button type="button" class="btn primary" id="generateBtn">Generate audio</button>
+          </div>
+          <p class="status" id="status"></p>
+        </div>
+      </section>
+
+      <section class="view hidden" id="viewHistory">
+        <div class="panel">
+          <div class="row">
+            <span class="field-label">History <span class="muted" id="historyCount"></span></span>
+            <button type="button" class="btn ghost small" id="refreshBtn">Refresh</button>
+          </div>
+          <ul class="history" id="historyList"></ul>
+          <p class="empty" id="historyEmpty">Nothing generated yet.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="player">
+      <div class="player-meta">
+        <span class="player-title" id="playerTitle">No audio loaded</span>
+        <span class="player-sub" id="playerSub"></span>
+      </div>
+      <audio id="audio" controls preload="none"></audio>
+    </footer>
+  </div>
+
+  <div class="lock" id="lock">
+    <form class="lock-card" id="lockForm">
+      <h1>Access required</h1>
+      <p class="muted">Enter the access key you set as <code>ACCESS_KEY</code> in your <code>.env</code> file.</p>
+      <input id="accessKey" type="password" autocomplete="current-password"
+        placeholder="Access key" autofocus required />
+      <button type="submit" class="btn primary">Unlock</button>
+      <p class="status error" id="lockError"></p>
+    </form>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
