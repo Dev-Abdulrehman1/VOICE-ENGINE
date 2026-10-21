@@ -12,3 +12,8 @@ venv/
 
 # macOS
 .DS_Store
+.vercel
+.env*
+
+# agent workspace
+.freebuff/

@@ -8,7 +8,9 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
 
 # DATA_DIR is read from the environment; main.py loads .env before importing this.
-DATA_DIR = Path(os.getenv("DATA_DIR", "data"))
+# Vercel Functions have a read-only filesystem apart from /tmp, so fall back there.
+DEFAULT_DATA_DIR = "/tmp/voice-engine" if os.getenv("VERCEL") else "data"
+DATA_DIR = Path(os.getenv("DATA_DIR") or DEFAULT_DATA_DIR)
 AUDIO_DIR = DATA_DIR / "audio"
 DB_PATH = DATA_DIR / "history.db"
 

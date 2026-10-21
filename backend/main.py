@@ -25,7 +25,7 @@ from pydantic import BaseModel, Field  # noqa: E402
 
 from backend import db  # noqa: E402
 
-FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")
+FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "public")
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
 OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "fish-audio/s2.1-pro-free:free").strip()
@@ -61,6 +61,9 @@ async def security_headers(request: Request, call_next):
     response.headers["Referrer-Policy"] = "no-referrer"
     if request.url.path.startswith("/api/"):
         response.headers["Cache-Control"] = "no-store"
+    else:
+        # Revalidate the shell and static assets so UI edits show up without a hard refresh.
+        response.headers.setdefault("Cache-Control", "no-cache")
     return response
 
 
@@ -232,5 +235,7 @@ async def get_audio(gen_id: str) -> FileResponse:
     )
 
 
-# Static UI is mounted last so the /api routes above win.
-app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
+# Static UI is mounted last so the /api routes above win. On Vercel the same
+# files are served by the CDN from public/, so only mount when they are present.
+if os.path.isdir(FRONTEND_DIR):
+    app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")

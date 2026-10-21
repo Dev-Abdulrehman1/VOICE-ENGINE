@@ -6,9 +6,10 @@ history you can replay or delete.
 
 - **Backend:** Python + FastAPI, calling OpenRouter's text-to-speech endpoint
 - **Speech model:** Fish Audio `s2.1-pro-free` (multilingual, expressive narration)
-- **Frontend:** one dark page, plain HTML/CSS/JS, no build step
+- **Frontend:** one light editorial page, plain HTML/CSS/JS, no build step
 - **Storage:** SQLite file + mp3 files on disk (stdlib only, no ORM)
 - **Access control:** every API route requires the access key set in `.env`
+- **Hosting:** runs locally with uvicorn, or on Vercel from `public/` + one Python function
 
 ```
 Browser ──POST /api/generate (X-Access-Key)──▶ FastAPI
@@ -26,8 +27,8 @@ Browser ──POST /api/generate (X-Access-Key)──▶ FastAPI
 | | |
 | --- | --- |
 | Script to speech | Paste a script, get audio back in a few seconds |
-| Built-in player | Fixed player bar at the bottom plays what was just generated |
-| History | Every attempt stored with timestamp, size and round-trip time; replay or delete any of it |
+| Transport bar | Fixed player with seek, volume, keyboard controls and a download button |
+| Library | Every take stored with timestamp, size and round-trip time; search, filter, replay or delete any of it |
 | Failure visibility | Failed generations are kept too, with the provider's error message |
 | Access key | The app will not start without `ACCESS_KEY`, and no API route answers without it |
 | No build step | The API and the UI are served by the same process, so there is no CORS setup |
@@ -69,9 +70,45 @@ uvicorn backend.main:app --reload --port 8000
 Open <http://127.0.0.1:8000>, enter the access key on the lock screen, and start
 generating. `⌘/Ctrl + Enter` in the script box also triggers Generate.
 
+## Deploy on Vercel
+
+The project is Vercel-ready: `api/index.py` exports the ASGI app, `public/` is served
+from the CDN, and every `/api/*` request reaches the Python function — no rewrites to
+write, no build step.
+
+```bash
+npm i -g vercel
+vercel login
+vercel link --project voice-engine
+```
+
+Set the secrets on the project, then ship it to production:
+
+```bash
+printf '%s' 'sk-or-v1-...'                    | vercel env add OPENROUTER_API_KEY production
+printf '%s' '<the-key-you-type-in-the-UI>'    | vercel env add ACCESS_KEY production
+printf '%s' 'fish-audio/s2.1-pro-free:free'   | vercel env add OPENROUTER_MODEL production
+printf '%s' '/tmp/voice-engine'               | vercel env add DATA_DIR production
+
+vercel deploy --prod
+```
+
+`DATA_DIR` must point at `/tmp` on Vercel: a Function's filesystem is read-only
+everywhere else, so both the SQLite file and the mp3 files are written there. Instances
+are ephemeral, which has two consequences:
+
+- A clip plays reliably right after it is generated, because the browser fetches the
+  audio immediately. A history entry opened much later can 404 once the instance that
+  wrote it is recycled
+- History is per instance and does not survive; two requests may land on different ones
+
+For durable history in the cloud, move the audio to a blob store and the rows to a
+hosted database — the storage layer is isolated in `backend/db.py` for exactly that swap.
+
 ## Configuration
 
-All settings live in `.env` (see `.env.example`).
+All settings live in `.env` (see `.env.example`). On Vercel, set them as project
+environment variables instead.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
@@ -89,13 +126,15 @@ at startup rather than running unprotected.
 
 ## Usage
 
-1. **Generate** tab — paste the script, press **Generate audio**. The request is
-   synchronous, so the button stays disabled until the audio arrives.
-2. The **player** at the bottom plays the result; the title shows the first words of the
-   script, the subtitle shows model, timestamp and file size.
-3. **History** tab — newest first, with timestamp, size and round-trip time.
-   **Play** loads an item into the player, **Delete** removes both the row and the mp3.
-   Items that failed are listed with the provider error instead of a Play button.
+1. **Studio** — paste the script, optionally add a voice ID and delivery notes, then
+   press **Generate audio**. The request is synchronous, so the button stays disabled
+   until the audio arrives.
+2. The **transport bar** at the bottom plays the result. Space toggles playback, the
+   timeline is scrubbable, and the download button saves the file.
+3. **Library** — newest first, with timestamp, render time and size. Search and filter
+   by status, replay, download, copy the script or delete a take. Failed generations are
+   listed with the provider's error instead of a play button.
+4. The three most recent takes also appear under the editor for quick replay.
 
 Fish Audio models accept inline delivery directions in square brackets, which you can
 write straight into the script:
@@ -134,13 +173,17 @@ browser, so no audio endpoint is ever left open.
 ## Project structure
 
 ```
+api/
+  index.py      Vercel entrypoint that re-exports the FastAPI app
 backend/
-  main.py       FastAPI app: auth, generate, history, audio, static UI
+  main.py       FastAPI app: auth, generate, history, audio, local static UI
   db.py         SQLite history store (stdlib sqlite3)
-frontend/
-  index.html    Navbar (Generate / History), script box, audio player, lock screen
-  styles.css    Dark theme
-  app.js        Access-key gate, generate, playback, history
+public/
+  index.html    Masthead, studio editor, delivery panel, library, transport, lock screen
+  styles.css    Light editorial theme: paper, ink, hairlines, system grotesk
+  app.js        Access-key gate, generate, custom player, searchable library
+vercel.json     Function duration limit
+.vercelignore   Keeps local secrets and data out of deployments
 requirements.txt
 .env.example
 ```
@@ -172,3 +215,4 @@ requirements.txt
 | Model-not-found error | The free slug may be unavailable for your account; set `OPENROUTER_MODEL=fish-audio/s2.1-pro-free` (paid) instead |
 | Generation fails with a timeout | Raise `REQUEST_TIMEOUT`; long scripts take longer to synthesize |
 | History row says the audio file is missing | The mp3 was deleted from `data/audio` while the row stayed; delete the row |
+| History resets or audio 404s after a while on Vercel | Expected: Functions only write to ephemeral `/tmp`. See *Deploy on Vercel* |

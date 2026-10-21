@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light" />
+  <meta name="theme-color" content="#ffffff" />
+  <title>Voice Engine — Text to speech studio</title>
+  <link rel="stylesheet" href="./styles.css?v=7" />
+</head>
+<body>
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-wave" viewBox="0 0 24 24">
+      <path d="M3 12h1.5M6.8 8.4v7.2M10.5 5.5v13M14.2 8v8M17.8 6.6v10.8M21 11v2" />
+    </symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.2v13.6L19 12z" fill="currentColor" stroke="none" /></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5.4h3.1v13.2H8zM12.9 5.4H16v13.2h-3.1z" fill="currentColor" stroke="none" /></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4.5v10m0 0 4-4m-4 4-4-4M5 18.5h14" /></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 7h15M9.5 7V5h5v2M7 7l.8 12h8.4L17 7M10.5 10.5v5M13.5 10.5v5" /></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2" /><path d="M15 6.5V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h.5" /></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.2" /><path d="m16 16 4 4" /></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.6-5.9M20 4.5V10h-5.5" /></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="9.5" rx="2" /><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" /></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7" /></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4.5 21 20H3z" /><path d="M12 10v4.5M12 17.4v.1" /></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><path d="M4 9.5h3L12 5.5v13L7 14.5H4z" /><path d="M15.5 9a4.5 4.5 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11" /></symbol>
+    <symbol id="i-volume-off" viewBox="0 0 24 24"><path d="M4 9.5h3L12 5.5v13L7 14.5H4z" /><path d="m16 9.5 5 5m0-5-5 5" /></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" /></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.8 12S6 6.5 12 6.5 21.2 12 21.2 12 18 17.5 12 17.5 2.8 12 2.8 12Z" /><circle cx="12" cy="12" r="2.6" /></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h13m0 0-5-5m5 5-5 5" /></symbol>
+    <symbol id="i-keyboard" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10.5" rx="2" /><path d="M7 11h.1M10.3 11h.1M13.6 11h.1M16.9 11h.1M8 14h8" /></symbol>
+  </svg>
+
+  <div class="app">
+    <header class="masthead">
+      <a class="wordmark" href="#studio" data-view="studio" aria-label="Voice Engine studio">
+        <span class="mark"><svg class="icon"><use href="#i-wave" /></svg></span>
+        <span class="wordmark-text">
+          <strong>Voice Engine</strong>
+          <span>Text to speech</span>
+        </span>
+      </a>
+
+      <nav class="tabs" aria-label="Workspace">
+        <button type="button" class="tab is-active" data-view="studio" id="navStudio">Studio</button>
+        <button type="button" class="tab" data-view="library" id="navLibrary">
+          Library <sup id="libraryCount">0</sup>
+        </button>
+      </nav>
+
+      <div class="masthead-meta">
+        <button type="button" class="quiet-btn" id="shortcutsBtn" title="Keyboard shortcuts" aria-label="Keyboard shortcuts">
+          <svg class="icon"><use href="#i-keyboard" /></svg>
+        </button>
+        <button type="button" class="quiet-btn" id="lockBtn" title="Lock studio">
+          <svg class="icon"><use href="#i-lock" /></svg>
+          <span>Lock</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="main" id="main">
+      <div class="page">
+        <!-- STUDIO -->
+        <section class="view" id="viewStudio" aria-label="Studio">
+          <header class="page-head">
+            <p class="kicker">Studio</p>
+            <h1>Write it. Hear it.</h1>
+            <p class="lede">A script, a delivery note, and a few seconds. Every take is kept in your library.</p>
+          </header>
+
+          <div class="studio">
+            <section class="composer">
+              <div class="section-bar">
+                <span class="section-no">01</span>
+                <h2>Script</h2>
+                <div class="section-tools">
+                  <button type="button" class="quiet-btn" id="sampleBtn">Sample</button>
+                  <button type="button" class="quiet-btn" id="clearBtn">Clear</button>
+                </div>
+              </div>
+
+              <label class="sr-only" for="script">Script</label>
+              <textarea id="script" class="script" spellcheck="false"
+                placeholder="Type or paste the script you want voiced…"></textarea>
+
+              <div class="script-stats">
+                <span id="counter">0 / 4,000</span>
+                <span id="wordCount">0 words</span>
+                <span id="estimate">≈ 0s audio</span>
+                <span class="stats-spacer"></span>
+                <span class="hint"><kbd>⌘</kbd><kbd>↵</kbd> generate</span>
+              </div>
+              <div class="meter" aria-hidden="true"><span id="meterFill"></span></div>
+
+              <div class="inserts">
+                <span class="inserts-label">Insert direction</span>
+                <div class="inserts-row" id="directionChips">
+                  <button type="button" class="insert" data-tag="[whispering] ">whispering</button>
+                  <button type="button" class="insert" data-tag="[excited] ">excited</button>
+                  <button type="button" class="insert" data-tag="[sighs] ">sighs</button>
+                  <button type="button" class="insert" data-tag="[pause] ">pause</button>
+                  <button type="button" class="insert" data-tag="[laughs] ">laughs</button>
+                </div>
+              </div>
+            </section>
+
+            <aside class="delivery">
+              <div class="section-bar">
+                <span class="section-no">02</span>
+                <h2>Delivery</h2>
+              </div>
+
+              <div class="field">
+                <label for="voiceInput">Voice ID</label>
+                <input id="voiceInput" class="line-input" type="text" autocomplete="off"
+                  placeholder="Default voice" list="voiceOptions" />
+                <datalist id="voiceOptions">
+                  <option value="alloy"></option>
+                  <option value="echo"></option>
+                  <option value="fable"></option>
+                  <option value="nova"></option>
+                  <option value="onyx"></option>
+                  <option value="shimmer"></option>
+                </datalist>
+                <p class="field-note">Leave blank to use the default voice.</p>
+              </div>
+
+              <div class="field">
+                <label for="instructions">Delivery notes</label>
+                <textarea id="instructions" class="line-input notes" rows="3" spellcheck="true"
+                  placeholder="Warm, measured, close to the mic. Slow the last line."></textarea>
+              </div>
+
+              <button type="button" class="btn ink block" id="generateBtn">
+                <span id="generateLabel">Generate audio</span>
+                <svg class="icon"><use href="#i-arrow" /></svg>
+              </button>
+
+              <div class="gen-progress" id="genProgress" hidden><span></span></div>
+              <p class="status" id="status" role="status" aria-live="polite"></p>
+
+              <div class="delivery-meta">
+                <div class="meta-row">
+                  <span class="meta-label">Format</span>
+                  <span class="meta-value" id="formatValue">—</span>
+                </div>
+                <div class="meta-row">
+                  <span class="meta-label">Limit</span>
+                  <span class="meta-value" id="limitValue">—</span>
+                </div>
+              </div>
+            </aside>
+          </div>
+
+          <section class="recent" id="recentSection" hidden>
+            <div class="recent-head">
+              <div class="section-bar bare">
+                <span class="section-no">03</span>
+                <h2>Recent takes</h2>
+              </div>
+              <button type="button" class="link-btn" data-view="library">
+                Open library <svg class="icon"><use href="#i-arrow" /></svg>
+              </button>
+            </div>
+            <div class="recent-grid" id="recentList"></div>
+          </section>
+        </section>
+
+        <!-- LIBRARY -->
+        <section class="view hidden" id="viewLibrary" aria-label="Library">
+          <header class="page-head">
+            <p class="kicker">Archive</p>
+            <h1>Library</h1>
+            <p class="lede" id="librarySub">Every take is saved with its script, settings and audio file.</p>
+          </header>
+
+          <div class="library-bar">
+            <div class="search">
+              <svg class="icon"><use href="#i-search" /></svg>
+              <label class="sr-only" for="searchInput">Search takes</label>
+              <input id="searchInput" type="search" placeholder="Search scripts, voices, errors" autocomplete="off" />
+              <kbd>/</kbd>
+            </div>
+            <div class="filters" role="group" aria-label="Filter takes">
+              <button type="button" class="is-active" data-filter="all">All</button>
+              <button type="button" data-filter="ready">Ready</button>
+              <button type="button" data-filter="failed">Failed</button>
+            </div>
+            <button type="button" class="quiet-btn refresh" id="refreshBtn">
+              <svg class="icon"><use href="#i-refresh" /></svg>
+              Refresh
+            </button>
+          </div>
+
+          <div class="take-table">
+            <div class="table-head" aria-hidden="true">
+              <span>Script</span>
+              <span>Status</span>
+              <span class="align-right">Actions</span>
+            </div>
+            <div class="take-list" id="libraryList" aria-live="polite"></div>
+          </div>
+
+          <div class="empty" id="libraryEmpty" hidden>
+            <h3 id="emptyTitle">No takes yet</h3>
+            <p id="emptyText">Generate your first clip and it will show up here.</p>
+            <button type="button" class="btn ink small" data-view="studio" id="emptyAction">Go to studio</button>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="player is-empty" id="player" aria-label="Audio player">
+      <div class="player-now">
+        <button type="button" class="play-btn" id="playBtn" disabled aria-label="Play">
+          <svg class="icon play-icon"><use href="#i-play" /></svg>
+          <svg class="icon pause-icon"><use href="#i-pause" /></svg>
+        </button>
+        <div class="now-copy">
+          <span class="now-eyebrow"><span class="now-dot"></span><span id="nowState">Playback</span></span>
+          <span class="now-title" id="playerTitle">No take loaded</span>
+          <span class="now-meta" id="playerSub">Generate audio to start playback</span>
+        </div>
+      </div>
+
+      <div class="transport">
+        <div class="seek" id="seek" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="seek-track"><span class="seek-fill" id="seekFill"></span></div>
+          <span class="seek-knob" id="seekKnob"></span>
+        </div>
+        <div class="transport-times">
+          <span id="timeNow">0:00</span>
+          <span id="timeTotal">0:00</span>
+        </div>
+      </div>
+
+      <div class="player-tools">
+        <button type="button" class="icon-btn" id="muteBtn" aria-label="Mute">
+          <svg class="icon volume-on"><use href="#i-volume" /></svg>
+          <svg class="icon volume-off"><use href="#i-volume-off" /></svg>
+        </button>
+        <input type="range" id="volume" class="volume" min="0" max="1" step="0.01" value="1" aria-label="Volume" />
+        <button type="button" class="icon-btn download" id="downloadBtn" disabled aria-label="Download audio" title="Download audio">
+          <svg class="icon"><use href="#i-download" /></svg>
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <audio id="audio" preload="metadata"></audio>
+
+  <!-- LOCK -->
+  <div class="lock" id="lock">
+    <div class="lock-frame">
+      <div class="lock-aside">
+        <div class="wordmark on-dark">
+          <span class="mark"><svg class="icon"><use href="#i-wave" /></svg></span>
+          <span class="wordmark-text"><strong>Voice Engine</strong><span>Text to speech</span></span>
+        </div>
+        <div class="lock-statement">
+          <p class="kicker on-dark">Private studio</p>
+          <h1>Your words,<br />out loud.</h1>
+          <p class="lock-copy">A small room for scripts, delivery notes and finished takes. Nothing here is public.</p>
+        </div>
+        <p class="lock-colophon">Private text to speech · Operator access only</p>
+      </div>
+
+      <form class="lock-form" id="lockForm">
+        <p class="kicker">Access</p>
+        <h2>Enter your key</h2>
+        <p class="lock-help">Use the <code>ACCESS_KEY</code> set in your environment file.</p>
+
+        <div class="field">
+          <label for="accessKey">Access key</label>
+          <div class="secret-field">
+            <input id="accessKey" type="password" autocomplete="current-password"
+              placeholder="••••••••••••" autofocus required />
+            <button type="button" class="reveal" id="revealBtn" aria-label="Show access key" aria-pressed="false">
+              <svg class="icon"><use href="#i-eye" /></svg>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn ink block" id="unlockBtn">
+          Unlock studio
+          <svg class="icon"><use href="#i-arrow" /></svg>
+        </button>
+        <p class="status error" id="lockError" role="alert"></p>
+        <p class="fineprint">Held in this tab's session only. Closing the tab locks the studio again.</p>
+      </form>
+    </div>
+  </div>
+
+  <dialog class="dialog" id="shortcutsDialog">
+    <header class="dialog-head">
+      <h2>Keyboard shortcuts</h2>
+      <button type="button" class="icon-btn" data-close aria-label="Close">
+        <svg class="icon"><use href="#i-x" /></svg>
+      </button>
+    </header>
+    <ul class="shortcut-list">
+      <li><span>Generate audio</span><span><kbd>⌘</kbd><kbd>↵</kbd></span></li>
+      <li><span>Play or pause</span><kbd>Space</kbd></li>
+      <li><span>Studio</span><kbd>1</kbd></li>
+      <li><span>Library</span><kbd>2</kbd></li>
+      <li><span>Search library</span><kbd>/</kbd></li>
+      <li><span>This panel</span><kbd>?</kbd></li>
+    </ul>
+  </dialog>
+
+  <dialog class="dialog" id="confirmDialog">
+    <header class="dialog-head">
+      <h2 id="confirmTitle">Delete this take?</h2>
+      <button type="button" class="icon-btn" data-close aria-label="Close">
+        <svg class="icon"><use href="#i-x" /></svg>
+      </button>
+    </header>
+    <p class="dialog-body" id="confirmText">The audio file will be removed from disk. This cannot be undone.</p>
+    <div class="dialog-actions">
+      <button type="button" class="quiet-btn" data-close>Cancel</button>
+      <button type="button" class="btn ink" id="confirmDelete">Delete take</button>
+    </div>
+  </dialog>
+
+  <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+  <script src="./app.js?v=7"></script>
+</body>
+</html>
